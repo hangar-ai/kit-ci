@@ -1,0 +1,14 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  kit-check:
+    uses: hangar-ai/.github/.github/workflows/kit-check.yml@v1

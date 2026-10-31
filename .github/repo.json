@@ -1,0 +1,10 @@
+{
+  "description": "A tab that follows a GitHub Actions run, opened by itself after a git push.",
+  "topics": [
+    "hangar-kit",
+    "hangar",
+    "claude-code",
+    "ci",
+    "github"
+  ]
+}
