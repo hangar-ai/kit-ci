@@ -5,6 +5,7 @@
 process.on("uncaughtException", () => process.exit(0));
 
 const { spawn } = require("node:child_process");
+const os = require("node:os");
 const path = require("node:path");
 const { isGitPush } = require("./lib.js");
 
@@ -19,8 +20,11 @@ process.stdin.on("end", () => {
     if (!HANGAR_API_URL || !HANGAR_API_TOKEN || !HANGAR_PANE_ID) process.exit(0);
     if (!isGitPush(event && event.tool_input && event.tool_input.command)) process.exit(0);
     const cwd = typeof event.cwd === "string" && event.cwd ? event.cwd : process.cwd();
-    const child = spawn(process.execPath, [path.join(__dirname, "find-run.js")], {
-      cwd,
+    // The search lives for half a minute, and it is not started in the project: on Windows a folder
+    // cannot be deleted while it is a process's working directory, and a worktree often goes right
+    // after its push. The temporary folder, as the kit's own could be removed with the kit.
+    const child = spawn(process.execPath, [path.join(__dirname, "find-run.js"), cwd], {
+      cwd: os.tmpdir(),
       detached: true,
       stdio: "ignore",
       windowsHide: true,

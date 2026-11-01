@@ -168,10 +168,52 @@ function runHook(input, env = {}) {
     });
     return { ...result, ms: Date.now() - started };
   } finally {
-    fs.rmSync(cwd, { recursive: true, force: true });
+    // The search runs git there, for a moment: on Windows that holds the folder until it ends.
+    fs.rmSync(cwd, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
   }
 }
 const HANGAR = { HANGAR_API_URL: "http://127.0.0.1:1", HANGAR_API_TOKEN: "t", HANGAR_PANE_ID: "p" };
+
+// /proc says which folder a process holds. Windows, where it matters most, cannot run these stand-ins
+// without a shell; Linux shows the same mistake.
+test("the search runs git and gh in the project, and does not itself sit in it", { skip: process.platform !== "linux" && "needs /proc" }, async (t) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ci-status-search-"));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }));
+  const project = path.join(root, "project");
+  const bin = path.join(root, "bin");
+  const log = path.join(root, "log");
+  fs.mkdirSync(project);
+  fs.mkdirSync(bin);
+  const standIn = (name, answer) => {
+    const script = `#!/bin/sh\necho "${name} $(pwd) $(readlink /proc/$PPID/cwd)" >> "${log}"\n${answer}\n`;
+    fs.writeFileSync(path.join(bin, name), script, { mode: 0o755 });
+  };
+  standIn("git", `echo ${"a".repeat(40)}`);
+  standIn("gh", "echo 'not logged in: auth login' >&2; exit 1");
+
+  const result = spawnSync(process.execPath, [path.join(KIT, "hooks", "open-ci.js")], {
+    input: JSON.stringify({ cwd: project, tool_input: { command: "git push" } }),
+    env: { PATH: `${bin}${path.delimiter}${process.env.PATH}`, ...HANGAR },
+    encoding: "utf8",
+    timeout: 15000,
+  });
+  assert.equal(result.status, 0);
+
+  let lines = [];
+  for (let waited = 0; waited < 10000 && lines.length < 2; waited += 50) {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    lines = fs.existsSync(log) ? fs.readFileSync(log, "utf8").trim().split("\n") : [];
+  }
+  assert.equal(lines.length, 2, "git, then gh");
+  const real = fs.realpathSync(project);
+  for (const [line, name] of lines.map((text, index) => [text, ["git", "gh"][index]])) {
+    const [program, ranIn, searchSitsIn] = line.split(" ");
+    assert.equal(program, name);
+    assert.equal(ranIn, real, `${name} runs in the project`);
+    assert.notEqual(searchSitsIn, real, "the search itself holds no project folder");
+    assert.ok(searchSitsIn, "the stand-in could read where the search sits");
+  }
+});
 
 test("the script exits 0 and says nothing: any input, any environment", () => {
   const cases = [

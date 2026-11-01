@@ -6,9 +6,12 @@ process.on("uncaughtException", () => process.exit(0));
 const { execFile } = require("node:child_process");
 const { findRuns, openTab } = require("./lib.js");
 
+/** The project's folder, from the hook. Only git and gh run in it, each for a moment. */
+const project = process.argv[2];
+
 function run(program, args) {
   return new Promise((resolve, reject) => {
-    execFile(program, args, { timeout: 20000, windowsHide: true, maxBuffer: 1 << 20 }, (error, stdout, stderr) => {
+    execFile(program, args, { cwd: project, timeout: 20000, windowsHide: true, maxBuffer: 1 << 20 }, (error, stdout, stderr) => {
       if (error) reject(Object.assign(error, { stderr: String(stderr || "") }));
       else resolve(String(stdout));
     });

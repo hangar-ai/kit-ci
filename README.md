@@ -17,8 +17,9 @@ kit of your own: every part of a kit is in it, in the smallest form that works.
 - **A hook** (Claude Code `PostToolUse` on `Bash`). When an agent in a pane runs
   `git push`, it looks for the run that push started — a run takes a few seconds
   to appear, so it retries for about half a minute — and opens the tab for it. The
-  search runs detached: the agent is never kept waiting, and the hook always exits
-  0, silently, whatever is missing (Node, `gh`, a run, Hangar).
+  search runs detached: the agent is never kept waiting, the project's folder stays
+  free to delete, and the hook always exits 0, silently, whatever is missing (Node,
+  `gh`, a run, Hangar).
 - **A skill** telling agents to open the tab with `kit_tab_open` when the hook did
   not, and to read a run's outcome with `gh` rather than sleeping.
 
