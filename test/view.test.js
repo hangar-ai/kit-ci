@@ -134,7 +134,7 @@ test("the link is a quiet line at the foot, and can be copied", async () => {
   const foot = one(root.all("ci-foot"));
   assert.match(foot.className, /kit-bar--foot/);
   assert.equal(foot.hidden, false);
-  const url = "https://github.com/simnJS/hangar-ai/actions/runs/41222364482";
+  const url = "https://github.com/hangar-ai/hangar/actions/runs/41222364482";
   const text = one(foot.all("kit-truncate"));
   assert.equal(text.text, url);
   assert.equal(text.title, url);

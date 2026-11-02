@@ -31,7 +31,7 @@ async function get(ref) {
   const tag = ref || `v${String(manifest.hangar).match(/\d+\.\d+\.\d+/)}`;
   fs.mkdirSync(DIR, { recursive: true });
   for (const [name, source] of Object.entries(FILES)) {
-    const answer = await fetch(`https://raw.githubusercontent.com/simnJS/hangar-ai/${tag}/${source}`);
+    const answer = await fetch(`https://raw.githubusercontent.com/hangar-ai/hangar/${tag}/${source}`);
     if (!answer.ok) throw new Error(`Hangar ${tag} has no ${source} (${answer.status}). It may not be tagged yet.`);
     fs.writeFileSync(path.join(DIR, name), Buffer.from(await answer.arrayBuffer()));
   }

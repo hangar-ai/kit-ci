@@ -24,7 +24,7 @@ kit of your own: every part of a kit is in it, in the smallest form that works.
   not, and to read a run's outcome with `gh` rather than sleeping.
 
 If `gh` is missing or not signed in, or the tab may not run it, the tab says so and
-how to fix it. It is drawn with [Hangar UI](https://github.com/simnJS/hangar-ai/blob/main/docs/kit-ui.md), so it follows
+how to fix it. It is drawn with [Hangar UI](https://github.com/hangar-ai/hangar/blob/main/docs/kit-ui.md), so it follows
 Hangar's theme, language and interface size, live, and holds at the side panel's
 narrowest.
 
@@ -84,7 +84,7 @@ ci-status/
 Choices worth copying:
 
 - **Hangar's library for the look.** The components, tokens, formats and the log are
-  [Hangar UI](https://github.com/simnJS/hangar-ai/blob/main/docs/kit-ui.md)'s; what the page adds is what only this tab knows,
+  [Hangar UI](https://github.com/hangar-ai/hangar/blob/main/docs/kit-ui.md)'s; what the page adds is what only this tab knows,
   such as which lines of a CI log are errors (`logic.js`, handed to `hangar.ui.log`).
 - **A redraw changes only what changed.** The page is redrawn every second while a run
   goes: `view.js` rebuilds a part only when what it shows changed, and writes the clocks
@@ -114,7 +114,7 @@ success, failure, not signed in, `gh` absent), which line of a real failed log i
 first error, the controller's polling and its single notification, what the view draws
 in each state, on a stand-in for `hangar.ui`, the hook's recognition of `git push`
 (and not `git push --help` or `echo git push`), and the manifest against the rules
-in [docs/kits.md](https://github.com/simnJS/hangar-ai/blob/main/docs/kits.md) — Hangar's own validator is Rust, so the Node
+in [docs/kits.md](https://github.com/hangar-ai/hangar/blob/main/docs/kits.md) — Hangar's own validator is Rust, so the Node
 test restates its rules. `test/fixtures/run-running.json` is the recorded
 success run with its statuses turned to « in progress », the one state that cannot
 be recorded after the fact.
