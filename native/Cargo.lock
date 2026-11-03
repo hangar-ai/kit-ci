@@ -5,7 +5,7 @@ version = 4
 [[package]]
 name = "hangar-kit-sdk"
 version = "1.12.1"
-source = "git+https://github.com/hangar-ai/hangar?branch=feat%2Fnative-rust#b0ea65b180991f4ecd88984c0a69d168a57545e8"
+source = "git+https://github.com/hangar-ai/hangar?branch=feat%2Fnative-rust#f636b2592bd5964da5b8ef35b0093b1570d3562d"
 dependencies = [
  "hangar-kit-ui",
  "serde",
@@ -15,7 +15,7 @@ dependencies = [
 [[package]]
 name = "hangar-kit-ui"
 version = "1.12.1"
-source = "git+https://github.com/hangar-ai/hangar?branch=feat%2Fnative-rust#b0ea65b180991f4ecd88984c0a69d168a57545e8"
+source = "git+https://github.com/hangar-ai/hangar?branch=feat%2Fnative-rust#f636b2592bd5964da5b8ef35b0093b1570d3562d"
 dependencies = [
  "serde",
  "serde_json",
