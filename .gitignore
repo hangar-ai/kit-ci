@@ -1,2 +1,3 @@
 .hangar-ui/
 node_modules/
+native/target/

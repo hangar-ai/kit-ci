@@ -1,0 +1,22 @@
+[package]
+name = "kit-ci-tab"
+description = "The CI tab of the ci-status kit: Rust, built to WebAssembly"
+version = "0.1.1"
+edition = "2024"
+publish = false
+
+# A cdylib is the module Hangar loads (tabs/ci.wasm); the rlib is for
+# `cargo test`, which runs the tab on the host with hangar_kit_sdk::testing.
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# Until a release tag holds the SDK, its branch.
+hangar-kit-sdk = { git = "https://github.com/hangar-ai/hangar", branch = "feat/native-rust" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true
