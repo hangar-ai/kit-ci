@@ -365,18 +365,20 @@ fn foot(ci: &Ci) -> Option<Element<Message>> {
     if url.is_empty() {
         return None;
     }
+    // A bar wraps what does not fit, so the line is a row of its own in it:
+    // the link gives way, the button stays.
     Some(
-        bar([
+        bar([row![
             container(tooltip(
                 text(url.clone()).small().dim().truncate(),
                 url.clone(),
             ))
-            .width(Length::Fill)
-            .into(),
-            icon_button(Icon::Copy, ci.t.t("copyLink"))
-                .on_press(Message::Copy(url.clone()))
-                .into(),
-        ])
+            .width(Length::Fill),
+            icon_button(Icon::Copy, ci.t.t("copyLink")).on_press(Message::Copy(url.clone())),
+        ]
+        .spacing(6.0)
+        .align(Align::Center)
+        .into()])
         .foot()
         .into(),
     )

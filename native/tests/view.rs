@@ -255,14 +255,15 @@ fn the_link_is_a_quiet_line_at_the_foot_and_can_be_copied() {
         hangar_kit_sdk::ui::Wrap::Truncate,
         "it gives way, the button stays"
     );
-    let copy = foot
-        .children
-        .iter()
-        .find_map(|child| match child {
-            Element::Button(button) => Some(button.clone()),
-            _ => None,
-        })
-        .expect("a copy button");
+    let mut copy = None;
+    for child in &foot.children {
+        child.for_each(&mut |e| {
+            if let Element::Button(button) = e {
+                copy = Some(button.clone());
+            }
+        });
+    }
+    let copy = copy.expect("a copy button");
     assert_eq!(
         copy.tooltip.as_deref(),
         Some("Copy the link"),
