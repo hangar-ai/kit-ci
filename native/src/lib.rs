@@ -38,9 +38,11 @@ pub const TICK: Duration = Duration::from_secs(1);
 pub const AGE: Duration = Duration::from_secs(60);
 /// Failures in a row, while following a run, before the vigil ends.
 pub const MAX_FAILURES: u32 = 3;
-/// The lines of a log given to Hangar at once, and at most when it asks.
+/// The lines of a log given to Hangar at once, and at most when it asks: Hangar asks
+/// for about 440, and a view may weigh 4 MB, which a thousand lines of the longest
+/// a log may have (`LINE_MAX`) stay well under.
 const WINDOW: usize = 400;
-const WINDOW_MAX: usize = 1500;
+const WINDOW_MAX: usize = 1000;
 
 /// What the tab shows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
