@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, rust-rewrite]
     tags: ["v*"]
   pull_request:
 
@@ -11,9 +11,9 @@ permissions:
 
 jobs:
   kit-check:
-    uses: hangar-ai/.github/.github/workflows/kit-check.yml@v1
+    uses: hangar-ai/.github/.github/workflows/kit-check.yml@rust-rewrite
 
-  # The native tab (native/, Rust built to WebAssembly) and the module Hangar runs.
+  # The tab is native (native/, Rust built to WebAssembly): its tests, and the module Hangar runs.
   native:
     name: Native tab
     runs-on: ubuntu-latest
@@ -39,11 +39,5 @@ jobs:
         run: cargo test --locked
       # Hangar runs the .wasm a kit ships and never builds one, so the committed module has to be
       # the one its source builds: the build is the same bytes on every machine (see the script).
-      - name: Build the module again
-        run: scripts/build-native.sh
       - name: The committed module is not stale
-        run: |
-          if ! git diff --quiet -- tabs/ci.wasm; then
-            echo "::error file=tabs/ci.wasm::tabs/ci.wasm is not what native/ builds: run scripts/build-native.sh and commit it"
-            exit 1
-          fi
+        run: scripts/build-native.sh --check
