@@ -1,13 +1,12 @@
 "use strict";
-// The manifest, checked by hand against docs/kits.md: Hangar's validator is Rust
-// (src-tauri/src/kits/manifest.rs) and cannot be reached from a Node test. Each
-// rule below is one of that page's, so a manifest that passes here is one it reads.
+// The manifest, checked by hand against docs/native/kits-native.md in Hangar: Hangar's validator
+// is Rust and cannot be reached from a Node test. Each rule below is one of that page's, so a
+// manifest that passes here is one it reads. The tab itself is tested in native/tests/.
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const { KIT } = require("./helpers.js");
-const { hangarFile, HANGAR_FILES_MISSING } = require("./hangar-ui.js");
 
 const manifest = JSON.parse(fs.readFileSync(path.join(KIT, "hangar-kit.json"), "utf8"));
 const exists = (relative) => fs.existsSync(path.join(KIT, relative));
@@ -22,13 +21,13 @@ function safePath(relative, extensions, at) {
 }
 
 test("the manifest's own fields", () => {
-  assert.equal(manifest.schema, 1);
+  assert.equal(manifest.schema, 2, "a native tab needs schema 2");
   assert.equal(manifest.id, "ci-status");
   assert.match(manifest.id, /^[a-z0-9-]{2,40}$/);
   assert.ok(manifest.name.trim());
   assert.match(manifest.version, SEMVER);
   assert.equal(typeof manifest.description, "string");
-  assert.equal(manifest.hangar, ">=1.9.0");
+  assert.equal(manifest.hangar, ">=2.0.0");
   assert.match(manifest.homepage, /^https?:\/\//);
   safePath(manifest.icon, [".svg", ".png"], "icon");
 });
@@ -46,7 +45,6 @@ test("the tab", () => {
   const tab = manifest.tabs[0];
   assert.match(tab.id, /^[a-z0-9-]{1,40}$/);
   assert.equal(tab.title, "CI");
-  safePath(tab.entry, [".html"], "tabs[0].entry");
   safePath(tab.icon, [".svg", ".png"], "tabs[0].icon");
   assert.notEqual(tab.singleton, true, "one tab per run");
   assert.deepEqual(Object.keys(tab.params), ["id"]);
@@ -56,22 +54,19 @@ test("the tab", () => {
   assert.ok(whole.test("41222364482") && !whole.test("") && !whole.test("12a") && !whole.test("-1") && !whole.test("1\n2"));
 });
 
-test("the native tab: a module beside the page, which an older Hangar ignores", () => {
+test("the tab is native: its entry is a WebAssembly module of the kit, built from native/", () => {
   const tab = manifest.tabs[0];
-  // Schema 1 and an HTML `entry`: Hangar 1.x opens the page and skips the field it does not know.
-  // A native Hangar opens the module, and the page only when the module cannot load.
-  assert.equal(manifest.schema, 1);
-  assert.equal(manifest.hangar, ">=1.9.0");
-  assert.match(tab.entry, /\.html$/);
-  // `native` names an existing .wasm file inside the kit, not hidden, 64 MB at most.
-  safePath(tab.native, [".wasm"], "tabs[0].native");
-  assert.doesNotMatch(tab.native, /(^|[/\\])\./, "no hidden part");
-  const size = fs.statSync(path.join(KIT, tab.native)).size;
+  assert.equal(tab.native, undefined, "no `native` field: the entry is the module");
+  // `entry` names an existing .wasm file inside the kit, not hidden, 64 MB at most.
+  safePath(tab.entry, [".wasm"], "tabs[0].entry");
+  assert.equal(tab.entry, "tabs/ci.wasm");
+  assert.doesNotMatch(tab.entry, /(^|[/\\])\./, "no hidden part");
+  const size = fs.statSync(path.join(KIT, tab.entry)).size;
   assert.ok(size > 0 && size <= 64 * 1024 * 1024, `${size} bytes`);
+  assert.ok(!exists("tabs/ci"), "no page beside the module");
   // The build script puts the module where the manifest says.
   const script = fs.readFileSync(path.join(KIT, "scripts", "build-native.sh"), "utf8");
-  assert.ok(script.includes(`"$kit/${tab.native}"`), "scripts/build-native.sh writes tabs[0].native");
-  // The page and the module are one tab: the same permissions, the same params.
+  assert.ok(script.includes(`"$kit/${tab.entry}"`), "scripts/build-native.sh writes tabs[0].entry");
   assert.deepEqual(tab.permissions, ["command:ci-run", "command:ci-list", "command:ci-log", "notify"]);
 });
 
@@ -127,60 +122,4 @@ test("the commands: an argv through gh, placeholders declared with a rule", () =
   ]);
   assert.deepEqual(manifest.commands["ci-log"].run, ["gh", "run", "view", "{id}", "--log-failed"]);
   assert.deepEqual(manifest.commands["ci-list"].run.slice(0, 5), ["gh", "run", "list", "--limit", "15"]);
-});
-
-test("the tab's page loads the kit's own files, and Hangar's library", () => {
-  const dir = path.join(KIT, "tabs", "ci");
-  const html = fs.readFileSync(path.join(dir, "index.html"), "utf8");
-  const sources = [...html.matchAll(/(?:src|href)="([^"]+)"/g)].map((match) => match[1]);
-  const library = ["/_hangar/kit.css", "/_hangar/kit.js", "/_hangar/kit-ui.js"];
-  assert.deepEqual(sources.filter((source) => source.startsWith("/")), library, "the sheet, then the SDK, then the behaviours");
-  assert.ok(sources.indexOf("/_hangar/kit-ui.js") < sources.indexOf("app.js"));
-  for (const source of sources.filter((source) => !library.includes(source))) {
-    assert.doesNotMatch(source, /^([a-z]+:)?\/\//i, `${source} leaves the kit`);
-    assert.doesNotMatch(source, /^\//, `${source} must be relative`);
-    assert.ok(fs.existsSync(path.join(dir, source)), source);
-  }
-  for (const name of fs.readdirSync(dir)) {
-    const text = fs.readFileSync(path.join(dir, name), "utf8");
-    assert.doesNotMatch(text, /\bfetch\(|XMLHttpRequest|WebSocket|localStorage|sessionStorage|\beval\(|innerHTML|@import|url\(\s*["']?https?:/, `${name} reaches outside what a tab may`);
-  }
-});
-
-test("the tab's sheet has no colour and no measure of its own", () => {
-  const sheet = fs.readFileSync(path.join(KIT, "tabs", "ci", "style.css"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
-  assert.doesNotMatch(sheet, /#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(|\bcolor-mix\(|\b(?:Canvas|CanvasText)\b|prefers-color-scheme/i, "Hangar's theme decides");
-  assert.doesNotMatch(sheet, /\b\d+(?:\.\d+)?(?:px|rem|em)\b/, "the library's measures follow the interface size");
-  for (const [, name] of sheet.matchAll(/^\.(ci-[a-z-]+)/gm)) assert.match(name, /^ci-/);
-});
-
-test("the classes the tab names are the library's, when the library is around", (t) => {
-  const sheet = hangarFile("kit.css");
-  if (!sheet) return t.skip(HANGAR_FILES_MISSING);
-  const known = fs.readFileSync(sheet, "utf8");
-  const dir = path.join(KIT, "tabs", "ci");
-  for (const name of ["index.html", "view.js", "style.css"]) {
-    const text = fs.readFileSync(path.join(dir, name), "utf8");
-    // A name being put together (`kit-icon--${icon}`) is left to the captures.
-    for (const [, used] of text.matchAll(/(?<![-\w/])(kit-[a-z0-9_-]*[a-z0-9])(?![a-z0-9_-]|\$\{)/g)) {
-      if (used === "kit-ui") continue;
-      assert.ok(known.includes(`.${used}`), `${name}: ${used} is not in kit.css`);
-    }
-    for (const [, token] of text.matchAll(/var\((--kit-[a-z0-9-]+)/g)) {
-      assert.ok(known.includes(`${token}:`), `${name}: ${token} is not in kit.css`);
-    }
-  }
-});
-
-test("the permissions used are in the docs, when the docs are around", (t) => {
-  const docs = hangarFile("kits.md");
-  if (!docs) return t.skip(HANGAR_FILES_MISSING);
-  const text = fs.readFileSync(docs, "utf8");
-  for (const permission of manifest.tabs[0].permissions.filter((p) => !p.startsWith("command:"))) {
-    assert.ok(text.includes(`\`${permission}\``), permission);
-  }
-  for (const method of ["command.run", "tab.setTitle", "tab.setBadge", "tab.params", "notify"]) {
-    assert.ok(text.includes(`\`${method}\``), method);
-  }
-  assert.ok(text.includes("/api/kit/tab/open"), "the hook's route");
 });

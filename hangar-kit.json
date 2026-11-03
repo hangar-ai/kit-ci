@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "id": "ci-status",
   "name": "CI status",
   "version": "0.1.1",
@@ -7,7 +7,7 @@
   "author": "Hangar",
   "homepage": "https://github.com/hangar-ai/kit-ci",
   "icon": "icon.svg",
-  "hangar": ">=1.9.0",
+  "hangar": ">=2.0.0",
   "gallery": {
     "permissionsSummary": "Runs the GitHub CLI (gh run list, gh run view) to read CI runs, shows a tab and sends notifications, and runs a hook after git push to open that tab.",
     "tags": ["ci", "github", "tab"]
@@ -41,8 +41,7 @@
     {
       "id": "ci",
       "title": "CI",
-      "entry": "tabs/ci/index.html",
-      "native": "tabs/ci.wasm",
+      "entry": "tabs/ci.wasm",
       "icon": "icon.svg",
       "permissions": ["command:ci-run", "command:ci-list", "command:ci-log", "notify"],
       "params": {

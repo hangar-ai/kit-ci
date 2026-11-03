@@ -12,7 +12,7 @@ const { KIT, fixture } = require("./helpers.js");
 
 const manifest = JSON.parse(fs.readFileSync(path.join(KIT, "hangar-kit.json"), "utf8"));
 const tab = manifest.tabs[0];
-const bytes = fs.readFileSync(path.join(KIT, tab.native));
+const bytes = fs.readFileSync(path.join(KIT, tab.entry));
 const compiled = new WebAssembly.Module(bytes);
 
 const ID = "41222364482";
