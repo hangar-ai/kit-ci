@@ -1,0 +1,7 @@
+# The toolchain the committed module (tabs/ci.wasm) is built with. A module is
+# only the same bytes twice when the compiler is the same, which is how CI
+# tells that the committed one is stale; change it with a rebuild.
+[toolchain]
+channel = "1.99.1"
+targets = ["wasm32-unknown-unknown"]
+components = ["clippy", "rustfmt"]

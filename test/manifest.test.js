@@ -56,6 +56,25 @@ test("the tab", () => {
   assert.ok(whole.test("41222364482") && !whole.test("") && !whole.test("12a") && !whole.test("-1") && !whole.test("1\n2"));
 });
 
+test("the native tab: a module beside the page, which an older Hangar ignores", () => {
+  const tab = manifest.tabs[0];
+  // Schema 1 and an HTML `entry`: Hangar 1.x opens the page and skips the field it does not know.
+  // A native Hangar opens the module, and the page only when the module cannot load.
+  assert.equal(manifest.schema, 1);
+  assert.equal(manifest.hangar, ">=1.9.0");
+  assert.match(tab.entry, /\.html$/);
+  // `native` names an existing .wasm file inside the kit, not hidden, 64 MB at most.
+  safePath(tab.native, [".wasm"], "tabs[0].native");
+  assert.doesNotMatch(tab.native, /(^|[/\\])\./, "no hidden part");
+  const size = fs.statSync(path.join(KIT, tab.native)).size;
+  assert.ok(size > 0 && size <= 64 * 1024 * 1024, `${size} bytes`);
+  // The build script puts the module where the manifest says.
+  const script = fs.readFileSync(path.join(KIT, "scripts", "build-native.sh"), "utf8");
+  assert.ok(script.includes(`"$kit/${tab.native}"`), "scripts/build-native.sh writes tabs[0].native");
+  // The page and the module are one tab: the same permissions, the same params.
+  assert.deepEqual(tab.permissions, ["command:ci-run", "command:ci-list", "command:ci-log", "notify"]);
+});
+
 test("permissions are known, and every command one names is declared", () => {
   const tab = manifest.tabs[0];
   const named = new Set();

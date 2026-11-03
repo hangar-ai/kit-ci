@@ -42,6 +42,7 @@
       "id": "ci",
       "title": "CI",
       "entry": "tabs/ci/index.html",
+      "native": "tabs/ci.wasm",
       "icon": "icon.svg",
       "permissions": ["command:ci-run", "command:ci-list", "command:ci-log", "notify"],
       "params": {
