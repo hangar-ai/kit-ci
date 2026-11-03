@@ -1,7 +1,6 @@
 //! The tab's behaviour against a fake Hangar and a fake clock: what it asks,
 //! what it sets, when it polls and stops, when it notifies.
-//! `test/controller.test.js`, ported, case for case, and the cases of what a
-//! native tab does that the page's script did not (`tab.params` as an event,
+//! Among them what a native tab does of its own (`tab.params` as an event,
 //! the log's windows, a tab behind another).
 
 mod support;

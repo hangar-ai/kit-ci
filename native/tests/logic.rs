@@ -1,5 +1,4 @@
-//! The page's logic on recorded gh output: `test/logic.test.js`, ported, case
-//! for case. (fixtures/*.json come from `gh run view/list` on this very
+//! The tab's logic on recorded gh output. (fixtures/*.json come from `gh run view/list` on this very
 //! repository; run-running.json is the success run with its status turned to
 //! "in progress", as gh writes it.)
 
@@ -556,11 +555,11 @@ fn what_reads_as_an_error_in_other_tools_logs_and_what_only_mentions_one() {
     }
 }
 
-/// `tests/golden/error-lines.json`: 1 100 lines, and what `tabs/ci/logic.js`
-/// says of each (`isErrorLine`), written once by running that function over
-/// the fixture's lines and over lines made of the words a CI log uses, in
-/// every case and place. The classifier here is written by hand rather than
-/// as the page's regular expression, so it is held to the page's answers.
+/// `tests/golden/error-lines.json`: 1 100 lines, and what the kit's earlier
+/// HTML tab said of each (its `isErrorLine`), written once by running that
+/// function over the fixture's lines and over lines made of the words a CI
+/// log uses, in every case and place. The classifier here is written by hand
+/// rather than as a regular expression, so it is held to those answers.
 #[test]
 fn the_hand_written_classifier_agrees_with_the_pages_on_1100_lines() {
     let golden: Vec<(String, bool)> =

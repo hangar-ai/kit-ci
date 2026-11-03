@@ -1,6 +1,5 @@
-//! The tab's words, in English and French: `STRINGS` of `tabs/ci/logic.js`,
-//! and the few that Hangar UI's `hangar.ui` said for the page and a native
-//! tab says for itself (the log's error bar, "Copied").
+//! The tab's words, in English and French: the states, the errors, the
+//! log's error bar, "Copied".
 //!
 //! French speaks as Hangar does: « tu », « workspace », « Réglages », and the
 //! apostrophe Hangar's strings use (the glossary in Hangar's `src/i18n.ts`).

@@ -1,4 +1,4 @@
-//! The state drawn as widgets: `view.js`, ported.
+//! The state drawn as widgets.
 //!
 //! Hangar draws every widget in the person's theme, so there is no class to
 //! name and no colour to choose: a state is a glyph and a word, a failure
@@ -19,8 +19,8 @@ use hangar_kit_sdk::ui::{LineKind as Shown, ListItem};
 use crate::logic::{self, ErrorKind, JobView, Kind, LineKind, RunRow};
 use crate::{Ci, Lines, LogState, Message, Problem, Screen};
 
-/// How tall the log of a failed run grows before it scrolls, in pixels. The
-/// page's was 56vh; a native page has no `vh`.
+/// How tall the log of a failed run grows before it scrolls, in pixels. A
+/// native page has no `vh`.
 pub const LOG_HEIGHT: f32 = 360.0;
 
 /// The glyph of a state, which says it by shape as well as colour.

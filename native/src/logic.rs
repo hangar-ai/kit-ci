@@ -1,6 +1,6 @@
-//! The tab's pure logic: what `gh` answered, turned into what the page shows.
+//! The tab's pure logic: what `gh` answered, turned into what the tab shows.
 //!
-//! `tabs/ci/logic.js`, ported. No widgets and no calls in here, so a test (or
+//! No widgets and no calls in here, so a test (or
 //! a reader) sees the rules without the page around them: which state a run
 //! is in, what a job is doing, why a command failed, which line of a CI log
 //! says what went wrong. Saying a duration or an age is the SDK's `format`,
@@ -553,9 +553,8 @@ fn mentions(haystack: &str, needle: &str) -> bool {
     find_ci(haystack.as_bytes(), needle.as_bytes(), 0).is_some()
 }
 
-/// Sorts what went wrong. The page's old client-side timeout (`kit.js` gave
-/// up on a call after 30 s) is gone: natively only a command's own limit
-/// remains, which is `timed_out`.
+/// Sorts what went wrong. Only a command's own limit times a call out, which
+/// is `timed_out`.
 pub fn classify(fault: Fault) -> ErrorKind {
     let (code, exit_code, stderr, timed_out) = match fault {
         Fault::Rejected { code } => (Some(code), Some(0), "", false),
@@ -762,8 +761,8 @@ pub fn read_log(raw: &str, truncated: bool) -> Log {
 // What the tools a CI runs write when something is wrong, each at a place in
 // the line where it says so: not any line that holds the word, since a list of
 // « test a_refused_error ... ok » holds it hundreds of times. Each rule below
-// is one alternative of the page's ERROR_LINE regular expression, tried
-// without regard to case.
+// is one alternative of the regular expression the kit's earlier HTML tab used
+// (ERROR_LINE), tried without regard to case.
 
 /// `\w`: the ASCII word characters, as JavaScript's `\w` and `\b` read them.
 fn is_word(byte: u8) -> bool {

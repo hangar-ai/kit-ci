@@ -1,8 +1,6 @@
 //! What the page draws for each state, as the widgets Hangar draws: a glyph
 //! and a word for a state, every state designed, both languages, nothing of
-//! what gh said taken for anything but text. `test/view.test.js`, ported,
-//! case for case; where the page's test looked at classes and DOM nodes,
-//! this one looks at the widgets.
+//! what gh said taken for anything but text. It looks at the widgets.
 
 mod support;
 
@@ -11,7 +9,7 @@ use kit_ci_tab::{LogState, POLL};
 use serde_json::json;
 use support::*;
 
-/// Where the page's view tests stood: 18:48:37 UTC, 31 October 2026.
+/// The moment the view tests stand at: 18:48:37 UTC, 31 October 2026.
 const NOW: &str = "2026-10-31T18:48:37Z";
 
 fn failed_run() -> Setup {

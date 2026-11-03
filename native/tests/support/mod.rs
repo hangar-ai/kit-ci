@@ -1,10 +1,9 @@
 //! Shared by the tests: recorded `gh` output, and a fake Hangar that answers
 //! like the real one and keeps a clock the tests move by hand.
 //!
-//! `test/helpers.js`, ported: `fakeHangar` is `Fake`, which answers the calls
-//! of the tab as the harness holds them, `fakeClock` is its `advance`, which
-//! fires the tab's timers when their time comes. The recorded output of `gh`
-//! in `test/fixtures/` is the page's own; both languages' tests read it.
+//! `Fake` answers the calls of the tab as the harness holds them, and its
+//! `advance` fires the tab's timers when their time comes. The recorded output
+//! of `gh` is in `test/fixtures/`, which `test/native.test.js` reads too.
 
 #![allow(dead_code)]
 

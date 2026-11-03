@@ -1,9 +1,8 @@
 //! CI status, the native tab: follows a GitHub Actions run, or lists the
 //! recent ones to choose from.
 //!
-//! The same tab as `tabs/ci/` (the page Hangar 1.x opens), in Rust built to
-//! WebAssembly; `tabs/ci.wasm` is what Hangar 2 runs. It calls the same host
-//! methods under the same permissions:
+//! Rust built to WebAssembly: `tabs/ci.wasm` is what Hangar runs. It calls
+//! these host methods, under the permissions the manifest declares:
 //!
 //! - `command.run` of `ci-run`, `ci-list` and `ci-log`, which are `gh`;
 //! - `tab.setTitle` and `tab.setBadge`, set on load and again when they change;
@@ -11,12 +10,12 @@
 //!
 //! Where the files are:
 //!
-//! - `logic.rs` is `logic.js`: gh's JSON and logs turned into what to show;
+//! - `logic.rs`: gh's JSON and logs turned into what to show;
 //! - `strings.rs` holds the words, English and French;
-//! - this file is `controller.js`: state, `update`, the 5 s poll, the clock;
-//! - `view.rs` is `view.js`: the state drawn as widgets.
+//! - this file: state, `update`, the 5 s poll, the clock;
+//! - `view.rs`: the state drawn as widgets.
 //!
-//! A refusal or a failure is a state of the page, drawn, never a panic.
+//! A refusal or a failure is a state of the tab, drawn, never a panic.
 
 use std::collections::BTreeMap;
 use std::time::Duration;
