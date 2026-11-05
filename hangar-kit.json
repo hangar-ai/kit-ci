@@ -2,7 +2,7 @@
   "schema": 2,
   "id": "ci-status",
   "name": "CI status",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A tab that follows a GitHub Actions run, opened by itself after a git push.",
   "author": "Hangar",
   "homepage": "https://github.com/hangar-ai/kit-ci",
